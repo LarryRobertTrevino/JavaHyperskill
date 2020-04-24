@@ -5,7 +5,36 @@ import java.util.*;
 public class Main {
     public static void main(String[] args) {
         List<person> data = enterData();
-        search(data);
+        Scanner scanner = new Scanner(System.in);
+        boolean go = true;
+        while (go) {
+            printMenu();
+            int answer = scanner.nextInt();
+            scanner.nextLine();
+            switch (answer) {
+                case 1:
+                    search(data);
+                    break;
+                case 2:
+                    for (person a : data) {
+                        System.out.println(a.toString());
+                    }
+                    break;
+                case 0:
+                    go = false;
+                    break;
+                default:
+                    System.out.println("Incorrect option! Try again.");
+                    break;
+            }
+        }
+    }
+
+    public static void printMenu() {
+        System.out.println("=== Menu ===");
+        System.out.println("1. Find a person");
+        System.out.println("2. Print all people");
+        System.out.println("0. Exit");
     }
 
     public static List<person> enterData() {
@@ -33,49 +62,42 @@ public class Main {
 
     public static void search(List<person> data) {
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Enter the number of search queries:");
-        int n = scanner.nextInt();
-        scanner.nextLine();
-        System.out.println();
-        String[] queries = new String[n];
-        for (int i = 0; i < n; i++) {
-            boolean found = false;
-            List<person> founded = new LinkedList<>();
-            System.out.println("Enter data to search people:");
-            queries[i] = scanner.nextLine();
-            for( person a : data) {
-                if (a.firstName.equalsIgnoreCase(queries[i]) || a.lastName.equalsIgnoreCase(queries[i])) {
+        System.out.println("Enter a name or email to search all suitable people.");
+        String request = scanner.nextLine();
+        boolean found = false;
+        List<person> founded = new LinkedList<>();
+        for( person a : data) {
+            if (a.firstName.equalsIgnoreCase(request) || a.lastName.equalsIgnoreCase(request)) {
+                founded.add(a);
+                found = true;
+                continue;
+            }
+            if (a.email != null) {
+                if (request.equals("@")) {
                     founded.add(a);
                     found = true;
                     continue;
                 }
-                if (a.email != null) {
-                    if (queries[i].equals("@")) {
+                String[] partOfEmail = a.email.split("\\W");
+                for (String b : partOfEmail) {
+                    if (b.equalsIgnoreCase(request)) {
                         founded.add(a);
                         found = true;
-                        continue;
-                    }
-                    String[] partOfEmail = a.email.split("\\W");
-                    for (String b : partOfEmail) {
-                        if (b.equalsIgnoreCase(queries[i])) {
-                            founded.add(a);
-                            found = true;
-                            break;
-                        }
+                        break;
                     }
                 }
             }
-            if (!found) {
-                System.out.println("No matching people found.");
-            } else {
-                System.out.println();
-                System.out.println("Found people:");
-                for (person a : founded) {
-                    System.out.println(a.toString());
-                }
-            }
-            System.out.println();
         }
+        if (!found) {
+            System.out.println("No matching people found.");
+        } else {
+            System.out.println();
+            System.out.println("Found people:");
+            for (person a : founded) {
+                System.out.println(a.toString());
+            }
+        }
+        System.out.println();
     }
 }
 
@@ -96,6 +118,8 @@ class person {
 
     @Override
     public String toString() {
-        return firstName + " " + lastName + " " + email;
+        if (email != null)
+            return firstName + " " + lastName + " " + email;
+        return firstName + " " + lastName;
     }
 }
