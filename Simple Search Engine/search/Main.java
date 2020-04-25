@@ -8,8 +8,9 @@ import java.util.regex.Pattern;
 
 public class Main {
     public static void main(String[] args) {
+        Map<String, Set<Integer>> searchMap = new LinkedHashMap<>();
         File inputData = new File(args[1]);
-        List<person> data = enterData(inputData);
+        List<person> data = enterData(inputData, searchMap);
         Scanner scanner = new Scanner(System.in);
         boolean go = true;
         while (go) {
@@ -18,7 +19,7 @@ public class Main {
             scanner.nextLine();
             switch (answer) {
                 case 1:
-                    search(data);
+                    searchByInvertedIndex(data, searchMap);
                     break;
                 case 2:
                     for (person a : data) {
@@ -44,8 +45,9 @@ public class Main {
         System.out.println("0. Exit");
     }
 
-    public static List<person> enterData(File file) {
+    public static List<person> enterData(File file, Map<String, Set<Integer>> searchMap) {
         List<person> data = new ArrayList<>();
+        int lineCount = 0;
         try(Scanner scanner = new Scanner(file)) {
             while (scanner.hasNext()) {
                 String[] temp = scanner.nextLine().split("\\s+");
@@ -58,11 +60,34 @@ public class Main {
                     default:
                         break;
                 }
+
+                for (String a : temp) {
+                    if (!searchMap.containsKey(a)) {
+                        searchMap.put(a, new LinkedHashSet<>());
+                    }
+                    searchMap.get(a).add(lineCount);
+                }
+                lineCount++;
             }
         } catch (FileNotFoundException e) {
             System.out.println("No file found: " + file);
         }
         return data;
+    }
+
+    public static void searchByInvertedIndex(List<person> data, Map<String, Set<Integer>> searchMap) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter a name or email to search all suitable people.");
+        String request = scanner.nextLine();
+        if (searchMap.get(request) == null) {
+            System.out.println("No matching people found.");
+            System.out.println();
+            return;
+        }
+        for (Integer a : searchMap.get(request)) {
+            System.out.println("" + searchMap.get(request).size() + "persons found:");
+            System.out.println(data.get(a).toString());
+        }
     }
 
     public static void search(List<person> data) {
@@ -114,3 +139,4 @@ class person {
         return firstName + " " + lastName;
     }
 }
+
