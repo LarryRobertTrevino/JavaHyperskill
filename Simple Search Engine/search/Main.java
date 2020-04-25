@@ -1,10 +1,15 @@
 package search;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Main {
     public static void main(String[] args) {
-        List<person> data = enterData();
+        File inputData = new File(args[1]);
+        List<person> data = enterData(inputData);
         Scanner scanner = new Scanner(System.in);
         boolean go = true;
         while (go) {
@@ -22,6 +27,8 @@ public class Main {
                     break;
                 case 0:
                     go = false;
+                    System.out.println();
+                    System.out.println("Bye!");
                     break;
                 default:
                     System.out.println("Incorrect option! Try again.");
@@ -37,26 +44,24 @@ public class Main {
         System.out.println("0. Exit");
     }
 
-    public static List<person> enterData() {
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Enter the number of people:");
-        int n = scanner.nextInt();
-        scanner.nextLine();
+    public static List<person> enterData(File file) {
         List<person> data = new ArrayList<>();
-        System.out.println("Enter all people:");
-        for (int i = 0; i < n; i++) {
-            String[] temp = scanner.nextLine().split("\\s+");
-            switch (temp.length) {
-                case 2:
-                    data.add(new person(temp[0],temp[1]));
-                    break;
-                case 3:
-                    data.add(new person(temp[0],temp[1],temp[2]));
-                default:
-                    break;
+        try(Scanner scanner = new Scanner(file)) {
+            while (scanner.hasNext()) {
+                String[] temp = scanner.nextLine().split("\\s+");
+                switch (temp.length) {
+                    case 2:
+                        data.add(new person(temp[0],temp[1]));
+                        break;
+                    case 3:
+                        data.add(new person(temp[0],temp[1],temp[2]));
+                    default:
+                        break;
+                }
             }
+        } catch (FileNotFoundException e) {
+            System.out.println("No file found: " + file);
         }
-        System.out.println();
         return data;
     }
 
@@ -64,28 +69,14 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Enter a name or email to search all suitable people.");
         String request = scanner.nextLine();
+        Pattern pattern = Pattern.compile(request, Pattern.CASE_INSENSITIVE);
         boolean found = false;
         List<person> founded = new LinkedList<>();
         for( person a : data) {
-            if (a.firstName.equalsIgnoreCase(request) || a.lastName.equalsIgnoreCase(request)) {
-                founded.add(a);
+            Matcher matcher = pattern.matcher(a.toString());
+            if (matcher.find()) {
                 found = true;
-                continue;
-            }
-            if (a.email != null) {
-                if (request.equals("@")) {
-                    founded.add(a);
-                    found = true;
-                    continue;
-                }
-                String[] partOfEmail = a.email.split("\\W");
-                for (String b : partOfEmail) {
-                    if (b.equalsIgnoreCase(request)) {
-                        founded.add(a);
-                        found = true;
-                        break;
-                    }
-                }
+                founded.add(a);
             }
         }
         if (!found) {
