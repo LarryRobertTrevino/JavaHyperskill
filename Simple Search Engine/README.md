@@ -49,3 +49,19 @@ The menu should display the following actions:
 The user must select a menu item and then enter data if necessary. Your program must not stop until the corresponding option (the exit option) is chosen.
 
 Decompose the program into separate methods to make it easy to understand and add to or edit later.
+
+Work on project. Stage 4/6: X-files
+
+Description
+
+Modify the program. The program should read data from a text file instead of the standard input. The file structure depends on your text’s meaning (personal information, building information, book information, and so on). See an example below..
+
+Dwight Joseph djo@gmail.com
+Rene Webb webb@gmail.com
+Katie Jacobs
+Erick Harrington harrington@gmail.com
+Myrtle Medina
+Erick Burgess
+The program must process the command line argument --data, after which the name of the file with the data goes. For example, --data text.txt.
+
+Note, the file should not include the total number of lines. All lines must be read only once at the start of your program.
